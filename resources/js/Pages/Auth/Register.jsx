@@ -1,8 +1,9 @@
 import InputError from '@/Components/InputError';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
 export default function Register() {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
@@ -25,7 +26,37 @@ export default function Register() {
         >
             <Head title="Daftar Admin" />
 
+            {flash?.error && (
+                <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
+                    {flash.error}
+                </div>
+            )}
+
             <form onSubmit={submit} className="space-y-5">
+                <a
+                    href={route('google.redirect')}
+                    className="inline-flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 px-4 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24">
+                        <path
+                            fill="#EA4335"
+                            d="M12 10.2v3.9h5.5c-.2 1.3-1.5 3.9-5.5 3.9-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.2.8 3.9 1.5l2.7-2.6C17 3.4 14.7 2.4 12 2.4 6.9 2.4 2.8 6.5 2.8 11.6s4.1 9.2 9.2 9.2c5.3 0 8.8-3.7 8.8-8.9 0-.6-.1-1.1-.2-1.7H12Z"
+                        />
+                    </svg>
+                    Daftar dengan Google
+                </a>
+
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-slate-200" />
+                    </div>
+                    <div className="relative flex justify-center">
+                        <span className="bg-white px-3 text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
+                            atau
+                        </span>
+                    </div>
+                </div>
+
                 <div>
                     <label
                         htmlFor="name"

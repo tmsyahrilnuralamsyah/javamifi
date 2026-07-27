@@ -3,8 +3,16 @@ import { useState } from 'react';
 
 const navigation = [
     { name: 'Dashboard', route: 'dashboard', current: 'dashboard' },
-    { name: 'Kategori', badge: 'Soon' },
-    { name: 'Buku', badge: 'Soon' },
+    {
+        name: 'Kategori',
+        route: 'admin.categories.index',
+        current: 'admin.categories.*',
+    },
+    {
+        name: 'Buku',
+        route: 'admin.books.index',
+        current: 'admin.books.*',
+    },
     { name: 'Pesanan', badge: 'Soon' },
     { name: 'Pembayaran', badge: 'Soon' },
 ];
@@ -105,25 +113,10 @@ export default function AuthenticatedLayout({ header, children }) {
                         <NavigationItem
                             key={item.name}
                             item={item}
-                            active={
-                                item.current
-                                    ? route().current(item.current)
-                                    : false
-                            }
+                            active={item.current ? route().current(item.current) : false}
                             onClick={() => setShowingSidebar(false)}
                         />
                     ))}
-                </div>
-
-                <div className="mt-auto rounded-3xl bg-slate-950 p-5 text-white">
-                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sky-300">
-                        Current Access
-                    </p>
-                    <h3 className="mt-3 text-lg font-semibold">Admin</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">
-                        Area ini disiapkan untuk pengelolaan dashboard,
-                        master data, dan transaksi.
-                    </p>
                 </div>
             </aside>
 
