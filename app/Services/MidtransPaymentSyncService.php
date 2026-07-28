@@ -5,13 +5,19 @@ namespace App\Services;
 use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class MidtransPaymentSyncService
 {
+    public function __construct(
+        protected N8nPaymentExportService $n8nPaymentExportService,
+    ) {
+    }
+
     public function syncByPaymentNumber(string $paymentNumber, array $payload): ?Payment
     {
         $payment = Payment::query()
-            ->with(['order.items', 'order.userBooks'])
+            ->with(['order.items', 'order.userBooks', 'order.user'])
             ->where('payment_number', $paymentNumber)
             ->first();
 
@@ -48,10 +54,20 @@ class MidtransPaymentSyncService
                         ],
                     );
                 }
+
+                DB::afterCommit(function () use ($payment) {
+                    try {
+                        $this->n8nPaymentExportService->exportPaidPayment(
+                            $payment->fresh(['order.user'])
+                        );
+                    } catch (Throwable $exception) {
+                        report($exception);
+                    }
+                });
             }
         });
 
-        return $payment->fresh(['order', 'order.items', 'order.userBooks']);
+        return $payment->fresh(['order', 'order.items', 'order.userBooks', 'order.user']);
     }
 
     protected function resolveOrderStatus(string $transactionStatus, string $fraudStatus): string

@@ -19,6 +19,7 @@ class Payment extends Model
         'gross_amount',
         'transaction_status',
         'paid_at',
+        'exported_to_sheet_at',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class Payment extends Model
         return [
             'gross_amount' => 'decimal:2',
             'paid_at' => 'datetime',
+            'exported_to_sheet_at' => 'datetime',
         ];
     }
 

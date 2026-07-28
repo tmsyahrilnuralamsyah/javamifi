@@ -52,4 +52,8 @@ return [
         'admin_number' => env('WHATSAPP_ADMIN_NUMBER', '62895364526171'),
     ],
 
+    'n8n' => [
+        'payments_webhook_url' => env('N8N_PAYMENTS_WEBHOOK_URL'),
+    ],
+
 ];

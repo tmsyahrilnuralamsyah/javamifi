@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('gross_amount', 12, 2);
             $table->string('transaction_status')->default('pending');
             $table->timestamp('paid_at')->nullable();
+            $table->timestamp('exported_to_sheet_at')->nullable();
             $table->timestamps();
         });
     }

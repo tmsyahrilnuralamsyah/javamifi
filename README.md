@@ -115,6 +115,7 @@ MIDTRANS_IS_PRODUCTION=false
 MIDTRANS_MERCHANT_NAME="${APP_NAME}"
 
 WHATSAPP_ADMIN_NUMBER=62895364526171
+N8N_PAYMENTS_WEBHOOK_URL=
 ```
 
 Catatan:
@@ -200,6 +201,30 @@ Endpoint notification yang dipakai aplikasi ini:
 ```text
 /payments/midtrans/notification
 ```
+
+## Setup n8n ke Google Sheet
+
+Jika ingin setiap pembayaran sukses otomatis masuk ke Google Sheet melalui n8n, isi juga `.env`:
+
+```env
+N8N_PAYMENTS_WEBHOOK_URL=https://your-subdomain.app.n8n.cloud/webhook/your-production-path
+```
+
+Alur integrasi:
+- Laravel hanya mengirim data pembayaran yang sudah sukses
+- Trigger dipanggil dari proses sinkron status Midtrans
+- n8n menerima payload lalu append row ke Google Sheet
+- Aplikasi menyimpan `exported_to_sheet_at` agar satu payment tidak terkirim dua kali
+
+Payload yang dikirim ke n8n:
+- `paid_at`
+- `payment_number`
+- `order_number`
+- `customer_name`
+- `customer_email`
+- `gross_amount`
+- `payment_type`
+- `transaction_status`
 
 ## Route Penting
 
