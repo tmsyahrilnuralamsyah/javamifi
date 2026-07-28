@@ -1,100 +1,148 @@
 # JAVAMIFI
 
-Javamifi adalah aplikasi web untuk penjualan ebook. Proyek ini dibangun menggunakan Laravel + Inertia (React) + Tailwind.
+Javamifi adalah aplikasi web penjualan ebook berbasis Laravel 12, Inertia.js, React, dan Tailwind CSS. Sistem ini dipakai untuk mengelola katalog ebook, transaksi pembelian online via Midtrans, serta area customer untuk melihat buku yang sudah dibeli.
 
-## Fitur
+## Gambaran Fitur
 
 ### Admin Panel
-- Dashboard (ringkasan angka + grafik revenue 7 hari/1 bulan/3 bulan, grafik jumlah pesanan 7 hari/1 bulan/3 bulan, top buku terlaris, dan pie chart status breakdown)
-- Master Data
-  - Kategori (CRUD + status aktif/nonaktif)
-  - Buku (CRUD + soft delete, upload cover ke storage, drive link, harga normal & diskon)
-- Transaksi
-  - Pesanan (list, search, sort, pagination, per_page)
-  - Pembayaran (list, search, sort, pagination, per_page)
-- Pengguna
-  - Customer (CRUD, search, sort, pagination, per_page)
-
-### Customer Area
-Bagian customer akan berisi:
-- Katalog buku
-- Detail buku
-- Checkout (bisa banyak buku)
-- Pembayaran (Midtrans)
-- Buku Saya (menampilkan drive link setelah pembayaran sukses)
-- Ubah password
+- Dashboard dengan data real dari database:
+  - grafik revenue
+  - grafik jumlah pesanan
+  - top buku terlaris
+  - status breakdown pesanan
+- Kelola kategori
+- Kelola buku
+- Kelola customer
+- Monitoring pesanan
+- Monitoring pembayaran
+- Login admin dengan email/password
 - Login Google
 
+### Customer Side
+- Landing page langsung menyatu dengan katalog ebook
+- Filter buku berdasarkan kategori
+- Live search di navbar berdasarkan judul, penulis, dan kategori
+- Detail buku publik
+- Keranjang berbasis session
+- Checkout banyak ebook sekaligus
+- Pembayaran online via Midtrans
+- Halaman `Buku Saya`
+- Halaman `Pesanan Saya`
+- Login, register, login Google
+- Ubah password melalui modal
+- Tombol WhatsApp admin
+
+## Alur Bisnis Singkat
+
+1. Admin membuat kategori dan buku.
+2. Buku yang tampil di landing hanya buku `is_published = true` dan kategori `is_active = 1`.
+3. Customer menambahkan ebook ke keranjang.
+4. Customer checkout dan dibawa ke Midtrans.
+5. Setelah pembayaran berhasil, status order dan payment diperbarui.
+6. Ebook otomatis masuk ke halaman `Buku Saya`.
+
 ## Tech Stack
-- PHP ^8.2
-- Laravel ^12
-- Inertia.js (React)
+
+- PHP `^8.2`
+- Laravel `^12.0`
+- Inertia.js
+- React `^18`
 - Tailwind CSS
-- Laravel Breeze (auth starter)
-- Laravel Socialite (login Google)
-- MySQL (atau DB lain sesuai konfigurasi `.env`)
+- Laravel Breeze
+- Laravel Socialite
+- MySQL
 
-## Cara Menjalankan (dari Clone)
-
-### 1) Clone Project
+## Clone Project
 
 ```bash
 git clone https://github.com/tmsyahrilnuralamsyah/javamifi.git
 cd javamifi
 ```
 
-### 2) Install Dependency
+## Install Dependency
 
 ```bash
 composer install
 npm install
 ```
 
-### 3) Setup Environment
+## Setup Environment
 
-Copy file environment:
+Salin file `.env.example` menjadi `.env`.
+
+Di Windows:
 
 ```bash
 copy .env.example .env
 ```
 
-Atur koneksi database di `.env`:
+Di macOS/Linux:
+
+```bash
+cp .env.example .env
+```
+
+Lalu generate app key:
+
+```bash
+php artisan key:generate
+```
+
+## Konfigurasi `.env`
+
+Minimal sesuaikan bagian berikut:
 
 ```env
+APP_NAME=javamifi
+APP_ENV=local
+APP_URL=http://127.0.0.1:8000
+
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=javamifi
 DB_USERNAME=root
 DB_PASSWORD=
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URL=http://127.0.0.1:8000/auth/google/callback
+
+MIDTRANS_MERCHANT_ID=
+MIDTRANS_CLIENT_KEY=
+MIDTRANS_SERVER_KEY=
+MIDTRANS_IS_PRODUCTION=false
+MIDTRANS_MERCHANT_NAME="${APP_NAME}"
+
+WHATSAPP_ADMIN_NUMBER=62895364526171
 ```
 
-Generate app key:
+Catatan:
+- Gunakan `GOOGLE_REDIRECT_URL`, bukan `GOOGLE_REDIRECT_URI`.
+- Untuk local, sebaiknya `APP_URL` disamakan dengan URL yang benar-benar dipakai saat menjalankan aplikasi, misalnya `http://127.0.0.1:8000`.
 
-```bash
-php artisan key:generate
-```
-
-### 4) Migrasi + Seeder
+## Migrasi dan Seeder
 
 ```bash
 php artisan migrate
 php artisan db:seed
 ```
 
-Seeder admin default:
+Seeder default akan membuat admin:
 - Email: `admin@javamifi.test`
 - Password: `password`
 
-### 5) Storage Link (untuk Cover Buku)
+## Storage Link
+
+Cover buku disimpan di storage public, jadi jalankan:
 
 ```bash
 php artisan storage:link
 ```
 
-### 6) Jalankan Aplikasi
+## Menjalankan Aplikasi
 
-Jalankan 2 terminal:
+Jalankan dua terminal.
 
 Terminal 1:
 
@@ -108,38 +156,85 @@ Terminal 2:
 npm run dev
 ```
 
-Akses:
-- http://127.0.0.1:8000
+Lalu buka:
 
-Login admin:
-- http://127.0.0.1:8000/login
+```text
+http://127.0.0.1:8000
+```
 
-## Setup Login Google (Socialite)
+## Setup Login Google
 
 Isi `.env`:
 
 ```env
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_REDIRECT_URL=http://127.0.0.1:8000/auth/google/callback
 ```
 
-Pastikan di Google Cloud Console:
+Di Google Cloud Console:
 - Authorized JavaScript origins:
-  - `http://localhost:8000`
+  - `http://127.0.0.1:8000`
 - Authorized redirect URIs:
-  - `http://localhost:8000/auth/google/callback`
+  - `http://127.0.0.1:8000/auth/google/callback`
 
-Jika perubahan `.env` tidak terbaca:
+Setelah ubah `.env`, jalankan:
 
 ```bash
 php artisan config:clear
 ```
 
-## Struktur Route Admin
-- Dashboard: `/dashboard`
-- Kategori: `/admin/categories`
-- Buku: `/admin/books`
-- Pesanan: `/admin/orders`
-- Pembayaran: `/admin/payments`
-- Customer: `/admin/customers`
+## Setup Midtrans
+
+Isi kredensial Midtrans di `.env`:
+
+```env
+MIDTRANS_MERCHANT_ID=
+MIDTRANS_CLIENT_KEY=
+MIDTRANS_SERVER_KEY=
+MIDTRANS_IS_PRODUCTION=false
+```
+
+Endpoint notification yang dipakai aplikasi ini:
+
+```text
+/payments/midtrans/notification
+```
+
+## Route Penting
+
+### Public / Customer
+- `/`
+- `/books/{slug}`
+- `/cart`
+- `/checkout`
+- `/my-books`
+- `/my-orders`
+- `/my-orders/{order}`
+- `/payments/midtrans/notification`
+
+### Admin
+- `/dashboard`
+- `/admin/categories`
+- `/admin/books`
+- `/admin/orders`
+- `/admin/payments`
+- `/admin/customers`
+
+## Struktur Data Singkat
+
+Tabel inti yang dipakai:
+- `users`
+- `categories`
+- `books`
+- `orders`
+- `order_items`
+- `payments`
+- `user_books`
+
+## Akun Admin Default
+
+```text
+Email    : admin@javamifi.test
+Password : password
+```

@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\GoogleProvider;
+use Illuminate\Http\RedirectResponse;
 use Throwable;
 
 class GoogleAuthController extends Controller
@@ -17,7 +19,7 @@ class GoogleAuthController extends Controller
      */
     public function redirect(): RedirectResponse
     {
-        return Socialite::driver('google')
+        return $this->googleProvider()
             ->stateless()
             ->redirect();
     }
@@ -28,39 +30,63 @@ class GoogleAuthController extends Controller
     public function callback(): RedirectResponse
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            /** @var SocialiteUser $googleUser */
+            $googleUser = $this->googleProvider()
+                ->stateless()
+                ->user();
         } catch (Throwable) {
             return redirect()
                 ->route('login')
                 ->with('error', 'Login dengan Google gagal. Silakan coba lagi.');
         }
 
+        $googleId = (string) $googleUser->getId();
+        $googleEmail = $googleUser->getEmail();
+        $googleName = $googleUser->getName();
+
+        if (! $googleEmail) {
+            return redirect()
+                ->route('login')
+                ->with('error', 'Akun Google kamu tidak memiliki email yang bisa digunakan untuk login.');
+        }
+
+        /** @var User|null $user */
         $user = User::query()
-            ->where('google_id', $googleUser->id)
-            ->orWhere('email', $googleUser->email)
+            ->where('google_id', $googleId)
+            ->orWhere('email', $googleEmail)
             ->first();
 
         if ($user) {
             $user->forceFill([
-                'name' => $googleUser->name ?: $user->name,
-                'email' => $googleUser->email,
-                'google_id' => $googleUser->id,
-                'email_verified_at' => $user->email_verified_at ?? now(),
-                'role' => $user->role ?: 'admin',
+                'name' => $googleName ?: $user->name,
+                'email' => $googleEmail,
+                'google_id' => $googleId,
+                'role' => $user->role ?: 'customer',
             ])->save();
         } else {
             $user = User::create([
-                'name' => $googleUser->name ?: 'Google User',
-                'email' => $googleUser->email,
-                'google_id' => $googleUser->id,
-                'email_verified_at' => now(),
-                'role' => 'admin',
-                'password' => Str::password(32),
+                'name' => $googleName ?: 'Google User',
+                'email' => $googleEmail,
+                'google_id' => $googleId,
+                'role' => 'customer',
+                'password' => (string) Str::password(32),
             ]);
         }
 
         Auth::login($user, true);
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $defaultRoute = $user->role === 'admin'
+            ? route('dashboard', absolute: false)
+            : route('storefront.index', absolute: false);
+
+        return redirect()->intended($defaultRoute);
+    }
+
+    protected function googleProvider(): GoogleProvider
+    {
+        /** @var GoogleProvider $provider */
+        $provider = Socialite::driver('google');
+
+        return $provider;
     }
 }

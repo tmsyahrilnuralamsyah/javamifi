@@ -17,7 +17,6 @@ class UserSeeder extends Seeder
             ['email' => 'admin@javamifi.test'],
             [
                 'name' => 'Administrator',
-                'email_verified_at' => now(),
                 'role' => 'admin',
                 'google_id' => null,
                 'password' => Hash::make('password'),

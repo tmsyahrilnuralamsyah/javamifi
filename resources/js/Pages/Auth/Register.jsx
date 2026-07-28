@@ -21,10 +21,10 @@ export default function Register() {
 
     return (
         <GuestLayout
-            title="Daftarkan akun admin"
-            subtitle="Buat akun admin baru untuk mulai mengelola aplikasi penjualan ebook."
+            title="Buat akun baru"
+            subtitle="Daftar sekali lalu kamu bisa belanja ebook, checkout, dan melihat Buku Saya dengan tampilan auth yang sama."
         >
-            <Head title="Daftar Admin" />
+            <Head title="Daftar" />
 
             {flash?.error && (
                 <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
@@ -151,11 +151,11 @@ export default function Register() {
                     disabled={processing}
                     className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    {processing ? 'Menyimpan...' : 'Buat Akun Admin'}
+                    {processing ? 'Menyimpan...' : 'Buat Akun'}
                 </button>
 
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                    Sudah punya akun admin?{' '}
+                    Sudah punya akun?{' '}
                     <Link
                         href={route('login')}
                         className="font-semibold text-sky-600 hover:text-sky-700"

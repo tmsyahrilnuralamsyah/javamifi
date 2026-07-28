@@ -16,10 +16,11 @@ return new class extends Migration
             $table->foreignId('order_id')->unique()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('payment_number')->unique();
             $table->string('payment_type')->nullable();
+            $table->string('snap_token')->nullable();
+            $table->text('snap_redirect_url')->nullable();
             $table->decimal('gross_amount', 12, 2);
             $table->string('transaction_status')->default('pending');
             $table->timestamp('paid_at')->nullable();
-            $table->timestamp('expired_at')->nullable();
             $table->timestamps();
         });
     }

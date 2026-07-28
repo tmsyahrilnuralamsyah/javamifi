@@ -14,10 +14,11 @@ class Payment extends Model
         'order_id',
         'payment_number',
         'payment_type',
+        'snap_token',
+        'snap_redirect_url',
         'gross_amount',
         'transaction_status',
         'paid_at',
-        'expired_at',
     ];
 
     protected function casts(): array
@@ -25,7 +26,6 @@ class Payment extends Model
         return [
             'gross_amount' => 'decimal:2',
             'paid_at' => 'datetime',
-            'expired_at' => 'datetime',
         ];
     }
 

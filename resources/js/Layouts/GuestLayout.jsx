@@ -1,17 +1,20 @@
-import { Link } from '@inertiajs/react';
+import WhatsAppButton from '@/Components/Storefront/WhatsAppButton';
+import { Link, usePage } from '@inertiajs/react';
 
 const defaultHighlights = [
-    'Dashboard admin modern dengan React + Tailwind.',
-    'Autentikasi admin siap dipakai untuk pengembangan modul berikutnya.',
-    'Tampilan responsif untuk desktop dan mobile.',
+    'Tampilan auth modern yang sama untuk admin dan customer.',
+    'Login Google tersedia untuk mempermudah akses akun.',
+    'Belanja ebook, checkout, dan akses buku dalam satu alur yang rapi.',
 ];
 
 export default function GuestLayout({
     children,
-    title = 'Masuk ke admin panel',
-    subtitle = 'Kelola katalog buku, pesanan, dan pembayaran dari satu tempat.',
+    title = 'Masuk ke akun kamu',
+    subtitle = 'Masuk ke akun kamu untuk belanja ebook atau mengelola dashboard.',
     highlights = defaultHighlights,
 }) {
+    const { app } = usePage().props;
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100">
             <div className="grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
@@ -35,7 +38,7 @@ export default function GuestLayout({
                                         Javamifi
                                     </p>
                                     <p className="text-sm text-slate-300">
-                                        Ebook Admin Panel
+                                        Ebook Platform
                                     </p>
                                 </div>
                             </Link>
@@ -45,13 +48,13 @@ export default function GuestLayout({
                                     Referensi gaya TailAdmin
                                 </span>
                                 <h1 className="text-4xl font-semibold leading-tight text-white xl:text-5xl">
-                                    Kelola bisnis ebook dengan tampilan admin
-                                    yang bersih dan modern.
+                                    Masuk ke platform ebook dengan tampilan yang
+                                    bersih dan modern.
                                 </h1>
                                 <p className="max-w-lg text-base leading-7 text-slate-300">
-                                    Area admin ini disiapkan untuk pengelolaan
-                                    kategori, buku, pesanan, dan pembayaran
-                                    dalam satu dashboard yang nyaman dipakai.
+                                    Area ini dipakai bersama oleh customer dan
+                                    admin, jadi pengalaman masuk akun tetap
+                                    konsisten dari katalog sampai dashboard.
                                 </p>
                             </div>
                         </div>
@@ -103,7 +106,7 @@ export default function GuestLayout({
                                         Javamifi
                                     </p>
                                     <p className="text-sm text-slate-400">
-                                        Ebook Admin Panel
+                                        Ebook Platform
                                     </p>
                                 </div>
                             </Link>
@@ -112,7 +115,7 @@ export default function GuestLayout({
                         <div className="rounded-[2rem] border border-white/10 bg-white p-6 text-slate-900 shadow-2xl shadow-slate-950/30 sm:p-8">
                             <div className="mb-8">
                                 <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
-                                    Admin Access
+                                    Account Access
                                 </p>
                                 <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
                                     {title}
@@ -127,6 +130,8 @@ export default function GuestLayout({
                     </div>
                 </div>
             </div>
+
+            <WhatsAppButton number={app?.whatsapp_admin_number} />
         </div>
     );
 }

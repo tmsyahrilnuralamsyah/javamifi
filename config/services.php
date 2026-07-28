@@ -41,4 +41,15 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    'midtrans' => [
+        'server_key' => env('MIDTRANS_SERVER_KEY'),
+        'client_key' => env('MIDTRANS_CLIENT_KEY'),
+        'is_production' => (bool) env('MIDTRANS_IS_PRODUCTION', false),
+        'merchant_name' => env('MIDTRANS_MERCHANT_NAME', config('app.name', 'Javamifi')),
+    ],
+
+    'whatsapp' => [
+        'admin_number' => env('WHATSAPP_ADMIN_NUMBER', '62895364526171'),
+    ],
+
 ];

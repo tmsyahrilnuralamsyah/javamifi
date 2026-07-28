@@ -2,8 +2,8 @@ import InputError from '@/Components/InputError';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
-export default function Login({ status, canResetPassword }) {
-    const { flash } = usePage().props;
+export default function Login({ status }) {
+    const { flash, app } = usePage().props;
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -20,10 +20,10 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout
-            title="Masuk ke admin panel"
-            subtitle="Gunakan akun admin untuk mengakses dashboard, buku, pesanan, dan pembayaran."
+            title="Masuk ke akun kamu"
+            subtitle="Pakai email, password, atau Google untuk lanjut ke katalog, checkout, Buku Saya, maupun dashboard admin."
         >
-            <Head title="Login Admin" />
+            <Head title="Login" />
 
             {status && (
                 <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
@@ -115,14 +115,14 @@ export default function Login({ status, canResetPassword }) {
                         Ingat saya
                     </label>
 
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="text-sm font-medium text-sky-600 transition hover:text-sky-700"
-                        >
-                            Lupa password?
-                        </Link>
-                    )}
+                    <a
+                        href={`https://wa.me/${app?.whatsapp_admin_number}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm font-medium text-emerald-600 transition hover:text-emerald-700"
+                    >
+                        Lupa password? Hubungi WA admin
+                    </a>
                 </div>
 
                 <button
@@ -130,11 +130,11 @@ export default function Login({ status, canResetPassword }) {
                     disabled={processing}
                     className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    {processing ? 'Memproses...' : 'Masuk ke Dashboard'}
+                    {processing ? 'Memproses...' : 'Masuk Sekarang'}
                 </button>
 
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                    Belum punya akun admin?{' '}
+                    Belum punya akun?{' '}
                     <Link
                         href={route('register')}
                         className="font-semibold text-sky-600 hover:text-sky-700"
