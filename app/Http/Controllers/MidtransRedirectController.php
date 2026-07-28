@@ -66,12 +66,12 @@ class MidtransRedirectController extends Controller
                 ->route('customer.my-books.index')
                 ->with('success', 'Pembayaran berhasil. Ebook kamu sudah masuk ke Buku Saya.'),
             'pending' => redirect()
-                ->route('customer.my-orders.show', $payment->order)
+                ->route('customer.my-orders.show', ['order' => $payment->order?->order_number])
                 ->with('success', $type === 'finish'
                     ? 'Pembayaran masih diproses. Silakan cek status pesanan beberapa saat lagi.'
                     : 'Pembayaran kamu masih menunggu penyelesaian.'),
             default => redirect()
-                ->route('customer.my-orders.show', $payment->order)
+                ->route('customer.my-orders.show', ['order' => $payment->order?->order_number])
                 ->with('error', 'Pembayaran belum berhasil diselesaikan. Silakan cek detail pesanan kamu.'),
         };
     }

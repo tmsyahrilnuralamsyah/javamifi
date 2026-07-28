@@ -156,7 +156,7 @@ class CheckoutController extends Controller
                     'snap_redirect_url' => $order->payment?->snap_redirect_url,
                     'my_books_url' => route('customer.my-books.index'),
                     'my_orders_url' => route('customer.my-orders.index'),
-                    'order_url' => route('customer.my-orders.show', $order),
+                    'order_url' => route('customer.my-orders.show', ['order' => $order->order_number]),
                 ],
             ]);
         } catch (Throwable $exception) {

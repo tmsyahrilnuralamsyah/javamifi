@@ -22,7 +22,7 @@ export default function Show({ order }) {
             setProcessing(true);
             setError('');
 
-            const response = await axios.post(route('customer.my-orders.pay', order.id));
+            const response = await axios.post(route('customer.my-orders.pay', order.order_number));
             const payload = response.data?.data;
 
             if (payload?.snap_redirect_url) {

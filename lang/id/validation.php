@@ -4,6 +4,7 @@ return [
     'accepted' => ':attribute harus disetujui.',
     'boolean' => ':attribute harus berupa ya atau tidak.',
     'confirmed' => 'Konfirmasi :attribute tidak cocok.',
+    'current_password' => 'Password saat ini yang kamu masukkan tidak sesuai.',
     'email' => ':attribute harus berupa alamat email yang valid.',
     'exists' => ':attribute yang dipilih tidak valid.',
     'image' => ':attribute harus berupa gambar.',
@@ -29,6 +30,7 @@ return [
     'attributes' => [
         'name' => 'nama',
         'email' => 'email',
+        'current_password' => 'password saat ini',
         'password' => 'password',
         'password_confirmation' => 'konfirmasi password',
         'category_id' => 'kategori',

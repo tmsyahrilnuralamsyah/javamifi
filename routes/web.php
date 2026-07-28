@@ -38,8 +38,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/my-books', [MyBookController::class, 'index'])->name('customer.my-books.index');
     Route::get('/my-orders', [MyOrderController::class, 'index'])->name('customer.my-orders.index');
-    Route::get('/my-orders/{order}', [MyOrderController::class, 'show'])->name('customer.my-orders.show');
-    Route::post('/my-orders/{order}/pay', [MyOrderController::class, 'pay'])->name('customer.my-orders.pay');
+    Route::get('/my-orders/{order:order_number}', [MyOrderController::class, 'show'])->name('customer.my-orders.show');
+    Route::post('/my-orders/{order:order_number}/pay', [MyOrderController::class, 'pay'])->name('customer.my-orders.pay');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

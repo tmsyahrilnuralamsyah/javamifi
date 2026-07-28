@@ -33,7 +33,7 @@ class MyBookController extends Controller
                     : null,
                 'order_number' => $userBook->order?->order_number,
                 'order_url' => $userBook->order
-                    ? route('customer.my-orders.show', $userBook->order)
+                    ? route('customer.my-orders.show', ['order' => $userBook->order->order_number])
                     : null,
                 'purchased_at' => $userBook->purchased_at?->format('d M Y H:i'),
             ])

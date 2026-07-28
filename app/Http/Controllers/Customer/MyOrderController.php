@@ -36,7 +36,7 @@ class MyOrderController extends Controller
                 'payment_status' => $order->payment?->transaction_status,
                 'created_at' => $order->created_at?->format('d M Y H:i'),
                 'paid_at' => $order->paid_at?->format('d M Y H:i'),
-                'detail_url' => route('customer.my-orders.show', $order),
+                'detail_url' => route('customer.my-orders.show', ['order' => $order->order_number]),
             ])
             ->values();
 
@@ -131,7 +131,7 @@ class MyOrderController extends Controller
                     'snap_token' => $order->payment->fresh()->snap_token,
                     'snap_redirect_url' => $order->payment->fresh()->snap_redirect_url,
                     'my_books_url' => route('customer.my-books.index'),
-                    'order_url' => route('customer.my-orders.show', $order),
+                    'order_url' => route('customer.my-orders.show', ['order' => $order->order_number]),
                 ],
             ]);
         } catch (Throwable $exception) {
