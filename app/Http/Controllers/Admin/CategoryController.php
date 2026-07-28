@@ -16,13 +16,29 @@ class CategoryController extends Controller
     /**
      * Display a listing of the categories.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = trim((string) $request->string('search'));
+        $sort = $request->string('sort')->toString() ?: 'created_at';
+        $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
+        $perPage = (int) $request->integer('per_page', 10);
+        $perPage = in_array($perPage, [10, 25, 50, 100], true) ? $perPage : 10;
+        $sortable = ['name', 'slug', 'books_count', 'is_active', 'created_at'];
+
         $categories = Category::query()
             ->withCount('books')
-            ->latest()
-            ->get()
-            ->map(fn (Category $category) => [
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('slug', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy(in_array($sort, $sortable, true) ? $sort : 'created_at', $direction)
+            ->paginate($perPage)
+            ->withQueryString()
+            ->through(fn (Category $category) => [
                 'id' => $category->id,
                 'name' => $category->name,
                 'slug' => $category->slug,
@@ -34,6 +50,12 @@ class CategoryController extends Controller
 
         return Inertia::render('Admin/Categories/Index', [
             'categories' => $categories,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $direction,
+                'per_page' => $perPage,
+            ],
         ]);
     }
 

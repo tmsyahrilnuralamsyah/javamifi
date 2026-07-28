@@ -1,7 +1,7 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SortableHeader from '@/Components/Admin/SortableHeader';
 import TablePagination from '@/Components/Admin/TablePagination';
 import TableToolbar from '@/Components/Admin/TableToolbar';
-import SortableHeader from '@/Components/Admin/SortableHeader';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -27,12 +27,12 @@ function FlashMessage() {
     return null;
 }
 
-export default function Index({ categories, filters }) {
+export default function Index({ customers, filters }) {
     const [search, setSearch] = useState(filters?.search ?? '');
 
     const applyFilters = (overrides = {}) => {
         router.get(
-            route('admin.categories.index'),
+            route('admin.customers.index'),
             {
                 search,
                 sort: filters?.sort ?? 'created_at',
@@ -48,14 +48,6 @@ export default function Index({ categories, filters }) {
         );
     };
 
-    const destroyCategory = (category) => {
-        if (!window.confirm(`Hapus kategori "${category.name}"?`)) {
-            return;
-        }
-
-        router.delete(route('admin.categories.destroy', category.id));
-    };
-
     const handleSort = (sortKey) => {
         const isCurrent = filters?.sort === sortKey;
 
@@ -65,27 +57,34 @@ export default function Index({ categories, filters }) {
         });
     };
 
+    const destroyCustomer = (customer) => {
+        if (!window.confirm(`Hapus customer "${customer.name}"?`)) {
+            return;
+        }
+
+        router.delete(route('admin.customers.destroy', customer.id));
+    };
+
     return (
         <AuthenticatedLayout
             header={
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
-                            Master Data
+                            Pengguna
                         </p>
                         <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-                            Kategori Buku
+                            Customer
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-500">
-                            Kelola kategori untuk pengelompokan ebook di
-                            katalog.
+                            Kelola akun customer yang terdaftar dan pantau
+                            aktivitas pembeliannya.
                         </p>
                     </div>
-
                 </div>
             }
         >
-            <Head title="Kategori" />
+            <Head title="Customer" />
 
             <div className="space-y-6">
                 <FlashMessage />
@@ -101,7 +100,7 @@ export default function Index({ categories, filters }) {
                         onReset={() => {
                             setSearch('');
                             router.get(
-                                route('admin.categories.index'),
+                                route('admin.customers.index'),
                                 {
                                     search: '',
                                     sort: 'created_at',
@@ -119,9 +118,9 @@ export default function Index({ categories, filters }) {
                         onPerPageChange={(value) =>
                             applyFilters({ per_page: value, page: 1 })
                         }
-                        createHref={route('admin.categories.create')}
-                        createLabel="Tambah Kategori"
-                        searchPlaceholder="Cari nama, slug, atau deskripsi kategori..."
+                        createHref={route('admin.customers.create')}
+                        createLabel="Tambah Customer"
+                        searchPlaceholder="Cari nama atau email customer..."
                     />
 
                     <div className="overflow-x-auto">
@@ -139,18 +138,27 @@ export default function Index({ categories, filters }) {
                                     </th>
                                     <th className="pb-4 pr-4">
                                         <SortableHeader
-                                            label="Slug"
-                                            sortKey="slug"
+                                            label="Email"
+                                            sortKey="email"
                                             currentSort={filters?.sort}
                                             currentDirection={filters?.direction}
                                             onSort={handleSort}
                                         />
                                     </th>
-                                    <th className="pb-4 pr-4">Deskripsi</th>
+                                    <th className="pb-4 pr-4">Login</th>
+                                    <th className="pb-4 pr-4">
+                                        <SortableHeader
+                                            label="Pesanan"
+                                            sortKey="orders_count"
+                                            currentSort={filters?.sort}
+                                            currentDirection={filters?.direction}
+                                            onSort={handleSort}
+                                        />
+                                    </th>
                                     <th className="pb-4 pr-4">
                                         <SortableHeader
                                             label="Buku"
-                                            sortKey="books_count"
+                                            sortKey="user_books_count"
                                             currentSort={filters?.sort}
                                             currentDirection={filters?.direction}
                                             onSort={handleSort}
@@ -158,8 +166,8 @@ export default function Index({ categories, filters }) {
                                     </th>
                                     <th className="pb-4 pr-4">
                                         <SortableHeader
-                                            label="Status"
-                                            sortKey="is_active"
+                                            label="Daftar"
+                                            sortKey="created_at"
                                             currentSort={filters?.sort}
                                             currentDirection={filters?.direction}
                                             onSort={handleSort}
@@ -169,47 +177,45 @@ export default function Index({ categories, filters }) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {categories.data.length > 0 ? (
-                                    categories.data.map((category) => (
-                                        <tr key={category.id}>
+                                {customers.data.length > 0 ? (
+                                    customers.data.map((customer) => (
+                                        <tr key={customer.id}>
                                             <td className="py-4 pr-4">
-                                                <div>
-                                                    <p className="font-semibold text-slate-900">
-                                                        {category.name}
-                                                    </p>
-                                                    <p className="mt-1 text-sm text-slate-500">
-                                                        Dibuat {category.created_at}
-                                                    </p>
-                                                </div>
+                                                <p className="font-semibold text-slate-900">
+                                                    {customer.name}
+                                                </p>
                                             </td>
                                             <td className="py-4 pr-4 text-sm text-slate-600">
-                                                {category.slug}
-                                            </td>
-                                            <td className="py-4 pr-4 text-sm text-slate-600">
-                                                {category.description || '-'}
-                                            </td>
-                                            <td className="py-4 pr-4 text-sm font-medium text-slate-900">
-                                                {category.books_count}
+                                                {customer.email}
                                             </td>
                                             <td className="py-4 pr-4">
                                                 <span
                                                     className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                                                        category.is_active
-                                                            ? 'bg-emerald-100 text-emerald-700'
-                                                            : 'bg-slate-200 text-slate-700'
+                                                        customer.google_id
+                                                            ? 'bg-sky-100 text-sky-700'
+                                                            : 'bg-slate-100 text-slate-700'
                                                     }`}
                                                 >
-                                                    {category.is_active
-                                                        ? 'Aktif'
-                                                        : 'Nonaktif'}
+                                                    {customer.google_id
+                                                        ? 'Google'
+                                                        : 'Email'}
                                                 </span>
+                                            </td>
+                                            <td className="py-4 pr-4 text-sm font-medium text-slate-900">
+                                                {customer.orders_count}
+                                            </td>
+                                            <td className="py-4 pr-4 text-sm font-medium text-slate-900">
+                                                {customer.user_books_count}
+                                            </td>
+                                            <td className="py-4 pr-4 text-sm text-slate-600">
+                                                {customer.created_at}
                                             </td>
                                             <td className="py-4 text-right">
                                                 <div className="flex justify-end gap-2">
                                                     <Link
                                                         href={route(
-                                                            'admin.categories.edit',
-                                                            category.id,
+                                                            'admin.customers.edit',
+                                                            customer.id,
                                                         )}
                                                         className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                                                     >
@@ -218,8 +224,8 @@ export default function Index({ categories, filters }) {
                                                     <button
                                                         type="button"
                                                         onClick={() =>
-                                                            destroyCategory(
-                                                                category,
+                                                            destroyCustomer(
+                                                                customer,
                                                             )
                                                         }
                                                         className="rounded-2xl border border-rose-200 px-4 py-2 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
@@ -233,12 +239,12 @@ export default function Index({ categories, filters }) {
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan="6"
+                                            colSpan="7"
                                             className="py-12 text-center text-sm text-slate-500"
                                         >
-                                            Belum ada kategori. Tambahkan
-                                            kategori pertama untuk mulai
-                                            mengelola buku.
+                                            Belum ada customer. Tambahkan data
+                                            customer pertama untuk mulai
+                                            mengelola pengguna.
                                         </td>
                                     </tr>
                                 )}
@@ -246,7 +252,7 @@ export default function Index({ categories, filters }) {
                         </table>
                     </div>
 
-                    <TablePagination paginated={categories} />
+                    <TablePagination paginated={customers} />
                 </section>
             </div>
         </AuthenticatedLayout>

@@ -1,59 +1,145 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# JAVAMIFI
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Javamifi adalah aplikasi web untuk penjualan ebook. Proyek ini dibangun menggunakan Laravel + Inertia (React) + Tailwind.
 
-## About Laravel
+## Fitur
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Admin Panel
+- Dashboard (ringkasan angka + grafik revenue 7 hari/1 bulan/3 bulan, grafik jumlah pesanan 7 hari/1 bulan/3 bulan, top buku terlaris, dan pie chart status breakdown)
+- Master Data
+  - Kategori (CRUD + status aktif/nonaktif)
+  - Buku (CRUD + soft delete, upload cover ke storage, drive link, harga normal & diskon)
+- Transaksi
+  - Pesanan (list, search, sort, pagination, per_page)
+  - Pembayaran (list, search, sort, pagination, per_page)
+- Pengguna
+  - Customer (CRUD, search, sort, pagination, per_page)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Customer Area
+Bagian customer akan berisi:
+- Katalog buku
+- Detail buku
+- Checkout (bisa banyak buku)
+- Pembayaran (Midtrans)
+- Buku Saya (menampilkan drive link setelah pembayaran sukses)
+- Ubah password
+- Login Google
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
+- PHP ^8.2
+- Laravel ^12
+- Inertia.js (React)
+- Tailwind CSS
+- Laravel Breeze (auth starter)
+- Laravel Socialite (login Google)
+- MySQL (atau DB lain sesuai konfigurasi `.env`)
 
-## Learning Laravel
+## Cara Menjalankan (dari Clone)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1) Clone Project
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone https://github.com/tmsyahrilnuralamsyah/javamifi.git
+cd javamifi
+```
 
-## Laravel Sponsors
+### 2) Install Dependency
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+composer install
+npm install
+```
 
-### Premium Partners
+### 3) Setup Environment
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Copy file environment:
 
-## Contributing
+```bash
+copy .env.example .env
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Atur koneksi database di `.env`:
 
-## Code of Conduct
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=javamifi
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Generate app key:
 
-## Security Vulnerabilities
+```bash
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4) Migrasi + Seeder
 
-## License
+```bash
+php artisan migrate
+php artisan db:seed
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Seeder admin default:
+- Email: `admin@javamifi.test`
+- Password: `password`
+
+### 5) Storage Link (untuk Cover Buku)
+
+```bash
+php artisan storage:link
+```
+
+### 6) Jalankan Aplikasi
+
+Jalankan 2 terminal:
+
+Terminal 1:
+
+```bash
+php artisan serve
+```
+
+Terminal 2:
+
+```bash
+npm run dev
+```
+
+Akses:
+- http://127.0.0.1:8000
+
+Login admin:
+- http://127.0.0.1:8000/login
+
+## Setup Login Google (Socialite)
+
+Isi `.env`:
+
+```env
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+```
+
+Pastikan di Google Cloud Console:
+- Authorized JavaScript origins:
+  - `http://localhost:8000`
+- Authorized redirect URIs:
+  - `http://localhost:8000/auth/google/callback`
+
+Jika perubahan `.env` tidak terbaca:
+
+```bash
+php artisan config:clear
+```
+
+## Struktur Route Admin
+- Dashboard: `/dashboard`
+- Kategori: `/admin/categories`
+- Buku: `/admin/books`
+- Pesanan: `/admin/orders`
+- Pembayaran: `/admin/payments`
+- Customer: `/admin/customers`

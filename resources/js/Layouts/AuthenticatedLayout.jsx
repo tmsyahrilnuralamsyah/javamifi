@@ -13,8 +13,21 @@ const navigation = [
         route: 'admin.books.index',
         current: 'admin.books.*',
     },
-    { name: 'Pesanan', badge: 'Soon' },
-    { name: 'Pembayaran', badge: 'Soon' },
+    {
+        name: 'Pesanan',
+        route: 'admin.orders.index',
+        current: 'admin.orders.*',
+    },
+    {
+        name: 'Pembayaran',
+        route: 'admin.payments.index',
+        current: 'admin.payments.*',
+    },
+    {
+        name: 'Customer',
+        route: 'admin.customers.index',
+        current: 'admin.customers.*',
+    },
 ];
 
 function NavigationItem({ item, active = false, onClick }) {

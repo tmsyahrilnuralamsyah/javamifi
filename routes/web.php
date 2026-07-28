@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +23,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('books', BookController::class)->except('show');
+        Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
+        Route::resource('customers', CustomerController::class)->except('show');
     });
 });
 

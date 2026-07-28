@@ -1,5 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import TablePagination from '@/Components/Admin/TablePagination';
+import TableToolbar from '@/Components/Admin/TableToolbar';
+import SortableHeader from '@/Components/Admin/SortableHeader';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 function formatCurrency(value) {
     return new Intl.NumberFormat('id-ID', {
@@ -31,13 +35,42 @@ function FlashMessage() {
     return null;
 }
 
-export default function Index({ books = [] }) {
+export default function Index({ books, filters }) {
+    const [search, setSearch] = useState(filters?.search ?? '');
+
+    const applyFilters = (overrides = {}) => {
+        router.get(
+            route('admin.books.index'),
+            {
+                search,
+                sort: filters?.sort ?? 'created_at',
+                direction: filters?.direction ?? 'desc',
+                per_page: filters?.per_page ?? 10,
+                ...overrides,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
+        );
+    };
+
     const destroyBook = (book) => {
         if (!window.confirm(`Hapus buku "${book.title}"?`)) {
             return;
         }
 
         router.delete(route('admin.books.destroy', book.id));
+    };
+
+    const handleSort = (sortKey) => {
+        const isCurrent = filters?.sort === sortKey;
+
+        applyFilters({
+            sort: sortKey,
+            direction: isCurrent && filters?.direction === 'asc' ? 'desc' : 'asc',
+        });
     };
 
     return (
@@ -57,12 +90,6 @@ export default function Index({ books = [] }) {
                         </p>
                     </div>
 
-                    <Link
-                        href={route('admin.books.create')}
-                        className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-                    >
-                        Tambah Buku
-                    </Link>
                 </div>
             }
         >
@@ -72,22 +99,87 @@ export default function Index({ books = [] }) {
                 <FlashMessage />
 
                 <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                    <TableToolbar
+                        search={search}
+                        onSearchChange={setSearch}
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            applyFilters({ page: 1 });
+                        }}
+                        onReset={() => {
+                            setSearch('');
+                            router.get(
+                                route('admin.books.index'),
+                                {
+                                    search: '',
+                                    sort: 'created_at',
+                                    direction: 'desc',
+                                    per_page: 10,
+                                },
+                                {
+                                    preserveState: true,
+                                    preserveScroll: true,
+                                    replace: true,
+                                },
+                            );
+                        }}
+                        perPage={filters?.per_page ?? 10}
+                        onPerPageChange={(value) =>
+                            applyFilters({ per_page: value, page: 1 })
+                        }
+                        createHref={route('admin.books.create')}
+                        createLabel="Tambah Buku"
+                        searchPlaceholder="Cari judul, penulis, kategori, ISBN, atau slug..."
+                    />
+
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-slate-200">
                             <thead>
                                 <tr className="text-left text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
                                     <th className="pb-4 pr-4">Cover</th>
-                                    <th className="pb-4 pr-4">Judul</th>
+                                    <th className="pb-4 pr-4">
+                                        <SortableHeader
+                                            label="Judul"
+                                            sortKey="title"
+                                            currentSort={filters?.sort}
+                                            currentDirection={filters?.direction}
+                                            onSort={handleSort}
+                                        />
+                                    </th>
                                     <th className="pb-4 pr-4">Kategori</th>
-                                    <th className="pb-4 pr-4">Penulis</th>
-                                    <th className="pb-4 pr-4">Harga</th>
-                                    <th className="pb-4 pr-4">Status</th>
+                                    <th className="pb-4 pr-4">
+                                        <SortableHeader
+                                            label="Penulis"
+                                            sortKey="author"
+                                            currentSort={filters?.sort}
+                                            currentDirection={filters?.direction}
+                                            onSort={handleSort}
+                                        />
+                                    </th>
+                                    <th className="pb-4 pr-4">
+                                        <SortableHeader
+                                            label="Harga"
+                                            sortKey="price_normal"
+                                            currentSort={filters?.sort}
+                                            currentDirection={filters?.direction}
+                                            onSort={handleSort}
+                                        />
+                                    </th>
+                                    <th className="pb-4 pr-4">
+                                        <SortableHeader
+                                            label="Status"
+                                            sortKey="is_published"
+                                            currentSort={filters?.sort}
+                                            currentDirection={filters?.direction}
+                                            onSort={handleSort}
+                                        />
+                                    </th>
                                     <th className="pb-4 text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {books.length > 0 ? (
-                                    books.map((book) => (
+                                {books.data.length > 0 ? (
+                                    books.data.map((book) => (
                                         <tr key={book.id}>
                                             <td className="py-4 pr-4">
                                                 {book.cover_url ? (
@@ -190,6 +282,8 @@ export default function Index({ books = [] }) {
                             </tbody>
                         </table>
                     </div>
+
+                    <TablePagination paginated={books} />
                 </section>
             </div>
         </AuthenticatedLayout>

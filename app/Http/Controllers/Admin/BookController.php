@@ -17,13 +17,32 @@ class BookController extends Controller
     /**
      * Display a listing of the books.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $search = trim((string) $request->string('search'));
+        $sort = $request->string('sort')->toString() ?: 'created_at';
+        $direction = $request->string('direction')->toString() === 'asc' ? 'asc' : 'desc';
+        $perPage = (int) $request->integer('per_page', 10);
+        $perPage = in_array($perPage, [10, 25, 50, 100], true) ? $perPage : 10;
+        $sortable = ['title', 'author', 'price_normal', 'price_discount', 'is_published', 'created_at'];
+
         $books = Book::query()
             ->with(['category:id,name'])
-            ->latest()
-            ->get()
-            ->map(fn (Book $book) => [
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->where('title', 'like', "%{$search}%")
+                        ->orWhere('author', 'like', "%{$search}%")
+                        ->orWhere('publisher', 'like', "%{$search}%")
+                        ->orWhere('isbn', 'like', "%{$search}%")
+                        ->orWhere('slug', 'like', "%{$search}%")
+                        ->orWhereHas('category', fn ($categoryQuery) => $categoryQuery->where('name', 'like', "%{$search}%"));
+                });
+            })
+            ->orderBy(in_array($sort, $sortable, true) ? $sort : 'created_at', $direction)
+            ->paginate($perPage)
+            ->withQueryString()
+            ->through(fn (Book $book) => [
                 'id' => $book->id,
                 'title' => $book->title,
                 'slug' => $book->slug,
@@ -40,6 +59,12 @@ class BookController extends Controller
 
         return Inertia::render('Admin/Books/Index', [
             'books' => $books,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+                'direction' => $direction,
+                'per_page' => $perPage,
+            ],
         ]);
     }
 
